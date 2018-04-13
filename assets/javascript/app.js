@@ -54,6 +54,10 @@ $(document).ready(function () {
         placeholder: "something",
 
         gameStart: false,
+        timerId: "",
+        timerEnabled: false,
+        timerStatus: 10,
+
         correctAnswers: 0,
         incorrectAnswers: 0,
 
@@ -62,6 +66,7 @@ $(document).ready(function () {
 
         //Location for Trivia Game Container- Set Equal to a Jquery object
         gameContainerTarget: "",
+        gameTimerTarget: "",
 
         //Tracks which question the game is on
         questionNumber: 0,
@@ -83,20 +88,30 @@ $(document).ready(function () {
                 image: "",
             }],
 
+        preGame: function () {
+            if (!triviaGame.gameStart) {
+                //Set Jquery Targets
+                triviaGame.gameContainerTarget = $("#game-container");
+                triviaGame.gameTimerTarget = $("#game-timer");
+                console.log("typeof", typeof this.gameContainerTarget);
+                triviaGame.gameStart = true;
+
+                //Start Game
+                triviaGame.printQuizToScreen();
+            }
+        },
+
         //Empty Main Content Div and Grab/Append Questions in HTML
 
         printQuizToScreen: function () {
+
             console.log("PrintQtoScreen");
 
-            triviaGame.gameStart = true;
 
-            this.gameContainerTarget = $("#game-container");
-            console.log("typeof", typeof this.gameContainerTarget);
-
-            console.log(this.questionNumber);
-            //If this.questionnumber=questions.length - game end
-            // else timer enabled
-
+            //TIMER- RESET TIMER, SET TIME, START TIMER
+            this.gameTimerStop();
+            this.timerStatus = 10;
+            this.gameTimerStart();
 
             //Empty Current Div Contents
             this.gameContainerTarget.empty();
@@ -134,7 +149,7 @@ $(document).ready(function () {
             this.gameContainerTarget.empty();
             var winLoseElement = $("<h2>");
             console.log("Checking Answer");
-
+            
             //Correct Answer
             if (param == this.questionLibrary[this.questionNumber].answer) {
                 this.correctAnswers++;
@@ -165,13 +180,16 @@ $(document).ready(function () {
                 setTimeout(_this.gameEnd(), 5000);
                 //console.log("TEST1: ",this.questionNumber,"TEST2",this.questionLibrary.length);
             } else {
-             setTimeout(_this.printQuizToScreen(), 4000);
+                setTimeout(_this.printQuizToScreen(), 4000);
             }
         },
 
+        //Game End runs after the question list runs out
         gameEnd: function () {
+            triviaGame.gameTimerStop();
             var imageElement = $("<img>");
             var h2 = $("<h2>");
+            var newGame = $("<p>");
 
 
             if (this.correctAnswers == this.questionLibrary.length) {
@@ -183,19 +201,75 @@ $(document).ready(function () {
                 imageElement.attr("src", this.losingImage);
                 h2.text("YOU LOSE THE GAME").addClass("text-center");
             }
+
+            //Append Game Win / Lose Image
             this.gameContainerTarget.empty();
+
             this.gameContainerTarget.append(imageElement, h2);
+
+            //Append Final Player Scores
+            h2.text("Correct Answers: " + this.correctAnswers + " " + " Incorrect Answers: " + this.incorrectAnswers);
+            this.gameContainerTarget.append(h2);
+
+            //Create and Append Restart Game? Button
+            newGame.text("Start Over?");
+            newGame.addClass("text-center mt-3 pb-3 restart-game");
+            this.gameContainerTarget.append(newGame);
+
+            $(".restart-game").on("click", function () {
+                console.log("Game-Restarted!");
+                triviaGame.gameRestart();
+            });
 
         },
 
+        //This object method resets all altered values- scores, and questionNumber- to zero (except gameStarted boolean!) and shoots us back into question 1.
+
+        gameRestart: function () {
+            this.correctAnswers = 0;
+            this.incorrectAnswers = 0;
+            this.questionNumber = 0;
+            this.printQuizToScreen();
+
+        },
+
+        decrement: function () {
+            triviaGame.timerStatus--;
+
+            console.log("Current time: ", triviaGame.timerStatus);
+
+            triviaGame.gameTimerTarget.text(triviaGame.timerStatus);
+
+            if (triviaGame.timerStatus === 0) {
+
+                triviaGame.gameTimerStop();
+                triviaGame.checkAnswer(100);
+            }
+        },
+
+
+        gameTimerStop: function () {
+            console.log("Timer Stopped");
+            clearInterval(triviaGame.timerId);
+        },
+
+        //Timer element to be displayed at the top of each question
+        gameTimerStart: function () {
+            this.timerId = setInterval(this.decrement, 1000);
+        },
+
+
+
     }
 
-    //Game Start Button
+
+
+    //Game Start Button Listener Is the only code outside the object- it listens for the original Start Game HTML element to be clicked
     $("#start-game").on("click", function () {
         console.log("Game Started");
-        console.log(triviaGame.gameStart);
-        triviaGame.printQuizToScreen();
+        triviaGame.preGame();
     });
+
 
 
 
