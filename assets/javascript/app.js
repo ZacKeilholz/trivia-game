@@ -53,32 +53,53 @@ $(document).ready(function () {
     var triviaGame = {
         placeholder: "something",
 
-
         gameStart: false,
+        correctAnswers: 0,
+        incorrectAnswers: 0,
+
+        winningImage: "",
+        losingImage: "",
+
+        //Location for Trivia Game Container- Set Equal to a Jquery object
+        gameContainerTarget: "",
+
+        //Tracks which question the game is on
         questionNumber: 0,
         questionLibrary:
             [{
                 question: "Fav Fruit?",
                 answer: 2,
                 choices: ["apple", "bananaIsRight", "orange"],
+                image: "",
             }, {
                 question: "Yo Mama?",
                 answer: 0,
                 choices: ["apple", "bananaIsRight", "orange"],
+                image: "",
+            }, {
+                question: "Yo Mama?",
+                answer: 0,
+                choices: ["apple", "bananaIsRight", "orange"],
+                image: "",
             }],
 
         //Empty Main Content Div and Grab/Append Questions in HTML
 
         printQuizToScreen: function () {
             console.log("PrintQtoScreen");
+
+            triviaGame.gameStart = true;
+
+            this.gameContainerTarget = $("#game-container");
+            console.log("typeof", typeof this.gameContainerTarget);
+
             console.log(this.questionNumber);
             //If this.questionnumber=questions.length - game end
             // else timer enabled
 
 
             //Empty Current Div Contents
-            var gameContainerTarget = $("#game-container");
-            gameContainerTarget.empty();
+            this.gameContainerTarget.empty();
 
             //Get object Target
 
@@ -86,7 +107,7 @@ $(document).ready(function () {
             var currentQuestion = $("<h3>").text(this.questionLibrary[this.questionNumber].question).addClass("text-center");
 
             //Append Game Question to HTML
-            gameContainerTarget.append(currentQuestion);
+            this.gameContainerTarget.append(currentQuestion);
 
             //Append Answer Choices
             for (var i = 0; i < this.questionLibrary[this.questionNumber].choices.length; i++) {
@@ -94,7 +115,7 @@ $(document).ready(function () {
                 newDiv.text(this.questionLibrary[this.questionNumber].choices[i])
                 //Use Data Class to hold choices index value for comparing to the answer
                 newDiv.addClass("text-center game-choice").attr("data-name", i);
-                gameContainerTarget.append(newDiv);
+                this.gameContainerTarget.append(newDiv);
             }
 
 
@@ -104,37 +125,77 @@ $(document).ready(function () {
                 triviaGame.checkAnswer(playerChoice);
             });
 
-          
+
         },
 
         //Check If the Selection Is correct and print to screen 
-        checkAnswer: function(param) {
+        checkAnswer: function (param) {
+
+            this.gameContainerTarget.empty();
+            var winLoseElement = $("<h2>");
             console.log("Checking Answer");
-            if (param==this.questionLibrary[this.questionNumber].answer) {
+
+            //Correct Answer
+            if (param == this.questionLibrary[this.questionNumber].answer) {
+                this.correctAnswers++;
                 console.log("You got it!");
+                var winLoseElement = $("<h2>");
+                winLoseElement.text("YOU ARE. THE BEST.").addClass("text-center");
+                this.gameContainerTarget.append(winLoseElement);
+
+                //Incorrect Answer
             } else {
-                console.log("NOPE");
-                
+                this.incorrectAnswers++;
+                console.log("YOU SUCK");
+                var winLoseElement = $("<h2>");
+                winLoseElement.text("NOPE").addClass("text-center");
+                this.gameContainerTarget.append(winLoseElement);
             }
 
-            //triviaGame.questionNumber++;
+            //Add an image from the object here
+            var imageElement = $("<img>");
+            imageElement.attr("src", this.questionLibrary[this.questionNumber].image).addClass("img responsive img-responsive");
+
+            this.questionNumber++;
+            console.log(this.questionNumber);
+
+            //Print the next question if there are any questions left, otherwise print the gameend screen
+            var _this = this;
+            if (this.questionNumber === this.questionLibrary.length) {
+                setTimeout(_this.gameEnd(), 5000);
+                //console.log("TEST1: ",this.questionNumber,"TEST2",this.questionLibrary.length);
+            } else {
+             setTimeout(_this.printQuizToScreen(), 4000);
+            }
+        },
+
+        gameEnd: function () {
+            var imageElement = $("<img>");
+            var h2 = $("<h2>");
+
+
+            if (this.correctAnswers == this.questionLibrary.length) {
+                console.log("YOU WIN THE GAME");
+                imageElement.attr("src", this.winningImage);
+                h2.text("YOU WIN").addClass("text-center");
+            } else {
+                console.log("YOU LOSE THE GAME");
+                imageElement.attr("src", this.losingImage);
+                h2.text("YOU LOSE THE GAME").addClass("text-center");
+            }
+            this.gameContainerTarget.empty();
+            this.gameContainerTarget.append(imageElement, h2);
 
         },
 
-
-
     }
-
 
     //Game Start Button
     $("#start-game").on("click", function () {
         console.log("Game Started");
-        triviaGame.gameStart = true;
         console.log(triviaGame.gameStart);
         triviaGame.printQuizToScreen();
     });
-
-
 
 
 
