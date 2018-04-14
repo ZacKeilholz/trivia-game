@@ -16,7 +16,7 @@
 
     <style>
         body {
-            background: url('') no-repeat center center fixed;
+            background: url('assets/images/pokemon-map.png') no-repeat center center fixed;
             -webkit-background-size: cover;
             -moz-background-size: cover;
             background-size: cover;
@@ -44,7 +44,7 @@
         }
 
         .game-choice:hover {
-            background-color:orangered;
+            background-color: orangered;
             cursor: pointer;
         }
     </style>
@@ -65,14 +65,14 @@
 
     <!--Main Content-->
     <section>
-        <div class="container bg-dark text-light">
+        <div class="container col-md-8 bg-primary text-light border border-white rounded">
             <div class="row">
-                <div class="col-12">
-                    <h1 class="text-center"id="game-name">Gotta guess 'em all!!!</h1>
+                <div class="col-10 offset-1">
+                    <h1 class="text-center mt-4" id="game-name">Gotta guess 'em all!!!</h1>
                 </div>
             </div>
             <br>
-            
+
             <!--Timer-->
             <div class="row">
                 <div class="col-12 ">
@@ -81,26 +81,30 @@
             </div>
 
             <br>
-            <br>
-            
+
             <div id="game-container">
                 <!--Start Game Button-->
                 <div class="row">
-                    <div class="col-2 mx-auto">
-                        <button class=" btn btn-primary" id="start-game">Start Game</button>
+                    <div class="col-md-2 mx-auto">
+                        <button class=" btn btn-success rounded-0" id="start-game">Start Game</button>
                     </div>
                 </div>
             </div>
+            <!--Image Container-->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <img src="" class="img-fluid" max-width="100%" height:"auto" id="image-container">
+                    <br>
 
-                <!--Image Container-->
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <img src="" class=""id="image-container">
-                        <br>
-                        <br>
-                        <br>
-                    </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div id="reset-container"></div>
+                </div>
+            </div>
+            <br>
+            <br>
 
 
 

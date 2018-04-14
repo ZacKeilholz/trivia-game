@@ -48,42 +48,51 @@ jqdoc - document ready
 
 $(document).ready(function () {
 
-    //Define Epic Object
+    ////////////////////////////////////
+    //Trivia Game Object
+    ////////////////////////////////////
 
     var triviaGame = {
-        placeholder: "something",
 
-        //Audio
-        introAudio: "",
-        battleAudio: "",
+        ////////////////////////////////////
+        //Scores/Misc. Game Variables
+        ////////////////////////////////////
 
-        audioSetup: function () {
-            var something = new Audio('assets/../../sounds/battle.mp3');
-            this.introAudio = new Audio('assets/../../sounds/main.mp3');
-
-            this.battleAudio = something;
-        },
-
-
-
+        //If true, the pregame method won't run when game is reset
         gameStart: false,
+
+        //Timer Vars
+
         timerId: "",
         timerEnabled: false,
-        timerStatus: 10,
+        timerStatus: 15,
+
+        //Score Vars
 
         correctAnswers: 0,
         incorrectAnswers: 0,
 
-        winningImage: "",
-        losingImage: "",
+        //Game End Gifs
 
-        //Location for Trivia Game Container- Set Equal to a Jquery object
+        winningImage: "assets/images/winGame.gif",
+        losingImage: "assets/images/loseGame.gif",
+
+        ////////////////////////////////////
+        //STORED JQUERY LOCATIONS
+        ////////////////////////////////////
+
         gameContainerTarget: "",
         gameTimerTarget: "",
-        imageContainerTarget:"",
+        imageContainerTarget: "",
 
-        //Tracks which question the game is on
+        //////////////////
+        //QUESTIONS
+        //////////////////
+
+        //Tracks Which is the Current Question
         questionNumber: 0,
+
+        
         questionLibrary:
             [{
                 question: "On Which Gaming Console was Pokemon Red/Blue Released?",
@@ -93,31 +102,33 @@ $(document).ready(function () {
             }, {
                 question: "Which 3 Pokemon can you choose from at the start of the game?",
                 answer: 1,
-                choices: ["Pikachu, Rattata, Pidgey", "Squirtle, Bulbasaur, Charmander","Larry, Moe, Curly","Jynx, Golem, Goldeen"],
+                choices: ["Pikachu, Rattata, Pidgey", "Squirtle, Bulbasaur, Charmander", "Larry, Moe, Curly", "Jynx, Golem, Goldeen"],
                 image: "assets/images/charmander.gif",
             }, {
                 question: "Who is the final boss?",
                 answer: 0,
-                choices: ["Gary", "Team Rocket","Mew-Two","Dr. Doom"],
+                choices: ["Gary", "Team Rocket", "Mew-Two", "Dr. Doom"],
                 image: "assets/images/gary.gif",
             }, {
                 question: "What does the Poke Flute Do?",
                 answer: 2,
-                choices: ["Transports you to anywhere on the map", "Allows you to return to the entrance of a dungeon","Wakes sleeping Pokemon","Unlocks secret doors"],
+                choices: ["Transports you to anywhere on the map", "Allows you to return to the entrance of a dungeon", "Wakes sleeping Pokemon", "Unlocks secret doors"],
                 image: "assets/images/sleeping.gif",
             }, {
                 question: "What's the name of the main character?",
                 answer: 3,
-                choices: ["Goku", "Misty", "Torx","Ash"],
+                choices: ["Goku", "Misty", "Torx", "Ash"],
                 image: "assets/images/ash.gif",
             }],
 
-        //1.  Run All Setup Functions and JQuery Targets (this only happens once)
+        ////////////////////////////////////
+        //SETUP FUNCTIONS- RUN ONLY ONCE
+        ////////////////////////////////////
+
         preGame: function () {
             if (!triviaGame.gameStart) {
-                //Set Jquery Targets
-                console.log("Question Printed to Screen");
 
+                //Set Jquery Targets
                 $("#game-name").hide();
                 triviaGame.gameContainerTarget = $("#game-container");
                 this.imageContainerTarget = $("#image-container");
@@ -129,23 +140,26 @@ $(document).ready(function () {
             }
         },
 
-        //2. Empty Main Content Div and Grab/Append Questions in HTML
+        ////////////////////////////////////
+        //MAIN QUESTION PRINTING METHOD
+        ////////////////////////////////////
 
         printQuizToScreen: function () {
-            this.imageContainerTarget.attr("src","");
-            console.log("Question Printed to Screen");
 
-           // this.battleAudio.play();
+            //Clean Screen
+            $("#reset-container").empty();
+            this.imageContainerTarget.attr("src", "");
+
 
             //TIMER- RESET TIMER, SET TIME, START TIMER
-            this.timerStatus = 10;
+            this.timerStatus = 15;
             this.gameTimerStart();
 
             //Empty Current Div Contents
             this.gameContainerTarget.empty();
 
             //Retrieve question from object
-            var currentQuestion = $("<h3>").text("Question " + (this.questionNumber + 1) + ": " + this.questionLibrary[this.questionNumber].question).addClass("text-center mb-3");
+            var currentQuestion = $("<h3>").text("Question " + (this.questionNumber + 1) + ": " + this.questionLibrary[this.questionNumber].question).addClass("text-center border-bottom border-white pb-2 mb-3");
 
             //Append Game Question to HTML
             this.gameContainerTarget.append(currentQuestion);
@@ -153,102 +167,99 @@ $(document).ready(function () {
             //Append Answer Choices
             for (var i = 0; i < this.questionLibrary[this.questionNumber].choices.length; i++) {
                 var newDiv = $("<h3>");
-                newDiv.text( this.questionLibrary[this.questionNumber].choices[i])
+                newDiv.text(this.questionLibrary[this.questionNumber].choices[i])
 
                 //Use Data Class to hold choices index value for comparing to the answer
                 newDiv.addClass("text-center game-choice").attr("data-name", i);
                 this.gameContainerTarget.append(newDiv);
             }
 
-
             $(".game-choice").on("click", function () {
                 triviaGame.gameTimerStop();
-                console.log("Choice clicked");
                 var playerChoice = $(this).attr("data-name");
                 triviaGame.checkAnswer(playerChoice);
             });
 
-
         },
 
-        //Check If the Selection Is correct and print to screen 
+        ////////////////////////////////////
+        //Check If User Answer Is Correct
+        ////////////////////////////////////
+
         checkAnswer: function (param) {
 
             this.gameContainerTarget.empty();
             var winLoseElement = $("<h2>");
             console.log("Checking Answer");
             var answerNumber = this.questionLibrary[this.questionNumber].answer;
-            //Correct Answer
+
+            //Correct Answer Check
             if (param == answerNumber) {
                 this.correctAnswers++;
-                console.log("You got it!");
                 var winLoseElement = $("<h2>");
                 winLoseElement.text("YOU ARE. THE BEST.").addClass("text-center");
                 this.gameContainerTarget.append(winLoseElement);
 
-                //Incorrect Answer
+                //Incorrect Answer Check
             } else {
                 this.incorrectAnswers++;
                 var winLoseElement = $("<h2>");
-                winLoseElement.text("NOPE. Correct Answer was: " +this.questionLibrary[this.questionNumber].choices[answerNumber] ).addClass("text-center");
+                winLoseElement.text("NOPE. Correct Answer was: " + this.questionLibrary[this.questionNumber].choices[answerNumber]).addClass("text-center");
                 this.gameContainerTarget.append(winLoseElement);
-
             }
-            var currentImage = this.questionLibrary[this.questionNumber].image;
-            console.log("CI" + currentImage);
+
             //Add an image from the object here
+            var currentImage = this.questionLibrary[this.questionNumber].image;
             this.imageContainerTarget.attr("src", this.questionLibrary[this.questionNumber].image);
-
             this.questionNumber++;
-            console.log(this.questionNumber);
-
             var _this = this;
 
             //Print the next question if there are any questions left, otherwise print the gameend screen
             if (_this.questionNumber === _this.questionLibrary.length) {
                 setTimeout(function () {
                     _this.gameEnd();
-                }, 3000);
+                }, 1000*5);
             } else {
                 setTimeout(function () {
                     _this.printQuizToScreen();
-                }, 3000);
+                }, 1000*5);
             }
         },
 
-        //Game End runs after the question list runs out
+        //////////////////
+        //Game End Screen
+        //////////////////
+
+        //Runs after the question list runs out
         gameEnd: function () {
-            console.log("Game End Function!");
-
-            triviaGame.gameTimerStop();
-            var imageElement = $("<img>");
-            var h2 = $("<h2>");
-            var newGame = $("<p>");
-
-
-            if (this.correctAnswers == this.questionLibrary.length) {
-                console.log("YOU WIN THE GAME");
-                imageElement.attr("src", this.winningImage);
-                h2.text("YOU WIN").addClass("text-center");
-            } else {
-                console.log("YOU LOSE THE GAME");
-                imageElement.attr("src", this.losingImage);
-                h2.text("YOU LOSE THE GAME").addClass("text-center");
-            }
-
-            //Append Game Win / Lose Image
             this.gameContainerTarget.empty();
+            this.imageContainerTarget.attr("src", "");
+            triviaGame.gameTimerStop();
 
-            this.gameContainerTarget.append(imageElement, h2);
+            var h2 = $("<h2>");
+            var newGame = $("<button>");
+
+            //WIN
+            if (this.correctAnswers == this.questionLibrary.length) {
+                this.imageContainerTarget.attr("src", this.winningImage);
+                this.gameTimerTarget.text("#WINNING");
+
+                //LOSE
+            } else {
+                this.imageContainerTarget.attr("src", this.losingImage);
+                this.gameTimerTarget.text("YOU LOSE THE GAME");
+            };
 
             //Append Final Player Scores
-            h2.text("Correct Answers: " + this.correctAnswers + " " + " Incorrect Answers: " + this.incorrectAnswers);
-            this.gameContainerTarget.append(h2);
+            var winLoseElement = $("<h2>");
+            $("#reset-container").append(newGame);
+            winLoseElement.text("Correct Answers: " + this.correctAnswers + " " + " Incorrect Answers: " + this.incorrectAnswers).addClass("text-center");
+
 
             //Create and Append Restart Game? Button
             newGame.text("Start Over?");
-            newGame.addClass("text-center mt-3 pb-3 restart-game");
-            this.gameContainerTarget.append(newGame);
+            newGame.addClass("text-center mt-3 rounded-0 btn btn-success mx-auto restart-game");
+            this.gameContainerTarget.append(winLoseElement);
 
             $(".restart-game").on("click", function () {
                 console.log("Game-Restarted!");
@@ -257,6 +268,33 @@ $(document).ready(function () {
 
         },
 
+        //////////////////
+        //TIMER METHODS
+        //////////////////
+
+        decrement: function () {
+            triviaGame.timerStatus--;
+            triviaGame.gameTimerTarget.text("Time Remaining: " + triviaGame.timerStatus);
+
+            if (triviaGame.timerStatus === 0) {
+                triviaGame.gameTimerStop();
+                triviaGame.checkAnswer();
+            }
+        },
+
+        gameTimerStop: function () {
+            clearInterval(triviaGame.timerId);
+            triviaGame.gameTimerTarget.text("Get Ready!");
+        },
+
+        gameTimerStart: function () {
+            this.timerId = setInterval(this.decrement, 1000);
+        },
+
+        //////////////////
+        //GAME RESET METHOD
+        //////////////////
+
         //This object method resets all altered values- scores, and questionNumber- to zero (except gameStarted boolean!) and shoots us back into question 1.
 
         gameRestart: function () {
@@ -264,36 +302,8 @@ $(document).ready(function () {
             this.incorrectAnswers = 0;
             this.questionNumber = 0;
             this.printQuizToScreen();
-
         },
-
-        decrement: function () {
-            triviaGame.timerStatus--;
-
-            console.log("Current time: ", triviaGame.timerStatus);
-
-            triviaGame.gameTimerTarget.text("Time Remaining: " + triviaGame.timerStatus);
-
-            if (triviaGame.timerStatus === 0) {
-                triviaGame.gameTimerStop();
-            }
-        },
-
-
-        gameTimerStop: function () {
-            console.log("Timer Stopped");
-            clearInterval(triviaGame.timerId);
-        },
-
-        //Timer element to be displayed at the top of each question
-        gameTimerStart: function () {
-            console.log("Timer Started");
-            this.timerId = setInterval(this.decrement, 1000);
-        }
-
     }
-
-
 
     //Game Start Button Listener Is the only code outside the object- it listens for the original Start Game HTML element to be clicked
     $("#start-game").on("click", function () {
