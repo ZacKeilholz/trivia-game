@@ -53,6 +53,19 @@ $(document).ready(function () {
     var triviaGame = {
         placeholder: "something",
 
+        //Audio
+        introAudio: "",
+        battleAudio: "",
+
+        audioSetup: function () {
+            var something = new Audio('assets/../../sounds/battle.mp3');
+            this.introAudio = new Audio('assets/../../sounds/main.mp3');
+
+            this.battleAudio = something;
+        },
+
+
+
         gameStart: false,
         timerId: "",
         timerEnabled: false,
@@ -67,33 +80,48 @@ $(document).ready(function () {
         //Location for Trivia Game Container- Set Equal to a Jquery object
         gameContainerTarget: "",
         gameTimerTarget: "",
+        imageContainerTarget:"",
 
         //Tracks which question the game is on
         questionNumber: 0,
         questionLibrary:
             [{
-                question: "Fav Fruit?",
+                question: "On Which Gaming Console was Pokemon Red/Blue Released?",
                 answer: 2,
-                choices: ["apple", "bananaIsRight", "orange"],
-                image: "",
+                choices: ["SNES (in Japan)", "NES", "GAMEBOY", "PSX"],
+                image: "assets/images/gameBoy.gif",
             }, {
-                question: "Yo Mama?",
-                answer: 0,
-                choices: ["apple", "bananaIsRight", "orange"],
-                image: "",
+                question: "Which 3 Pokemon can you choose from at the start of the game?",
+                answer: 1,
+                choices: ["Pikachu, Rattata, Pidgey", "Squirtle, Bulbasaur, Charmander","Larry, Moe, Curly","Jynx, Golem, Goldeen"],
+                image: "assets/images/charmander.gif",
             }, {
-                question: "Yo Mama?",
+                question: "Who is the final boss?",
                 answer: 0,
-                choices: ["apple", "bananaIsRight", "orange"],
-                image: "",
+                choices: ["Gary", "Team Rocket","Mew-Two","Dr. Doom"],
+                image: "assets/images/gary.gif",
+            }, {
+                question: "What does the Poke Flute Do?",
+                answer: 2,
+                choices: ["Transports you to anywhere on the map", "Allows you to return to the entrance of a dungeon","Wakes sleeping Pokemon","Unlocks secret doors"],
+                image: "assets/images/sleeping.gif",
+            }, {
+                question: "What's the name of the main character?",
+                answer: 3,
+                choices: ["Goku", "Misty", "Torx","Ash"],
+                image: "assets/images/ash.gif",
             }],
 
+        //1.  Run All Setup Functions and JQuery Targets (this only happens once)
         preGame: function () {
             if (!triviaGame.gameStart) {
                 //Set Jquery Targets
+                console.log("Question Printed to Screen");
+
+                $("#game-name").hide();
                 triviaGame.gameContainerTarget = $("#game-container");
+                this.imageContainerTarget = $("#image-container");
                 triviaGame.gameTimerTarget = $("#game-timer");
-                console.log("typeof", typeof this.gameContainerTarget);
                 triviaGame.gameStart = true;
 
                 //Start Game
@@ -101,25 +129,23 @@ $(document).ready(function () {
             }
         },
 
-        //Empty Main Content Div and Grab/Append Questions in HTML
+        //2. Empty Main Content Div and Grab/Append Questions in HTML
 
         printQuizToScreen: function () {
+            this.imageContainerTarget.attr("src","");
+            console.log("Question Printed to Screen");
 
-            console.log("PrintQtoScreen");
-
+           // this.battleAudio.play();
 
             //TIMER- RESET TIMER, SET TIME, START TIMER
-            this.gameTimerStop();
             this.timerStatus = 10;
             this.gameTimerStart();
 
             //Empty Current Div Contents
             this.gameContainerTarget.empty();
 
-            //Get object Target
-
             //Retrieve question from object
-            var currentQuestion = $("<h3>").text(this.questionLibrary[this.questionNumber].question).addClass("text-center");
+            var currentQuestion = $("<h3>").text("Question " + (this.questionNumber + 1) + ": " + this.questionLibrary[this.questionNumber].question).addClass("text-center mb-3");
 
             //Append Game Question to HTML
             this.gameContainerTarget.append(currentQuestion);
@@ -127,7 +153,8 @@ $(document).ready(function () {
             //Append Answer Choices
             for (var i = 0; i < this.questionLibrary[this.questionNumber].choices.length; i++) {
                 var newDiv = $("<h3>");
-                newDiv.text(this.questionLibrary[this.questionNumber].choices[i])
+                newDiv.text( this.questionLibrary[this.questionNumber].choices[i])
+
                 //Use Data Class to hold choices index value for comparing to the answer
                 newDiv.addClass("text-center game-choice").attr("data-name", i);
                 this.gameContainerTarget.append(newDiv);
@@ -135,6 +162,7 @@ $(document).ready(function () {
 
 
             $(".game-choice").on("click", function () {
+                triviaGame.gameTimerStop();
                 console.log("Choice clicked");
                 var playerChoice = $(this).attr("data-name");
                 triviaGame.checkAnswer(playerChoice);
@@ -149,9 +177,9 @@ $(document).ready(function () {
             this.gameContainerTarget.empty();
             var winLoseElement = $("<h2>");
             console.log("Checking Answer");
-            
+            var answerNumber = this.questionLibrary[this.questionNumber].answer;
             //Correct Answer
-            if (param == this.questionLibrary[this.questionNumber].answer) {
+            if (param == answerNumber) {
                 this.correctAnswers++;
                 console.log("You got it!");
                 var winLoseElement = $("<h2>");
@@ -161,31 +189,37 @@ $(document).ready(function () {
                 //Incorrect Answer
             } else {
                 this.incorrectAnswers++;
-                console.log("YOU SUCK");
                 var winLoseElement = $("<h2>");
-                winLoseElement.text("NOPE").addClass("text-center");
+                winLoseElement.text("NOPE. Correct Answer was: " +this.questionLibrary[this.questionNumber].choices[answerNumber] ).addClass("text-center");
                 this.gameContainerTarget.append(winLoseElement);
-            }
 
+            }
+            var currentImage = this.questionLibrary[this.questionNumber].image;
+            console.log("CI" + currentImage);
             //Add an image from the object here
-            var imageElement = $("<img>");
-            imageElement.attr("src", this.questionLibrary[this.questionNumber].image).addClass("img responsive img-responsive");
+            this.imageContainerTarget.attr("src", this.questionLibrary[this.questionNumber].image);
 
             this.questionNumber++;
             console.log(this.questionNumber);
 
-            //Print the next question if there are any questions left, otherwise print the gameend screen
             var _this = this;
-            if (this.questionNumber === this.questionLibrary.length) {
-                setTimeout(_this.gameEnd(), 5000);
-                //console.log("TEST1: ",this.questionNumber,"TEST2",this.questionLibrary.length);
+
+            //Print the next question if there are any questions left, otherwise print the gameend screen
+            if (_this.questionNumber === _this.questionLibrary.length) {
+                setTimeout(function () {
+                    _this.gameEnd();
+                }, 3000);
             } else {
-                setTimeout(_this.printQuizToScreen(), 4000);
+                setTimeout(function () {
+                    _this.printQuizToScreen();
+                }, 3000);
             }
         },
 
         //Game End runs after the question list runs out
         gameEnd: function () {
+            console.log("Game End Function!");
+
             triviaGame.gameTimerStop();
             var imageElement = $("<img>");
             var h2 = $("<h2>");
@@ -238,12 +272,10 @@ $(document).ready(function () {
 
             console.log("Current time: ", triviaGame.timerStatus);
 
-            triviaGame.gameTimerTarget.text(triviaGame.timerStatus);
+            triviaGame.gameTimerTarget.text("Time Remaining: " + triviaGame.timerStatus);
 
             if (triviaGame.timerStatus === 0) {
-
                 triviaGame.gameTimerStop();
-                triviaGame.checkAnswer(100);
             }
         },
 
@@ -255,10 +287,9 @@ $(document).ready(function () {
 
         //Timer element to be displayed at the top of each question
         gameTimerStart: function () {
+            console.log("Timer Started");
             this.timerId = setInterval(this.decrement, 1000);
-        },
-
-
+        }
 
     }
 
@@ -271,6 +302,5 @@ $(document).ready(function () {
     });
 
 
-
-
 });
+

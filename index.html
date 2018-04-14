@@ -42,6 +42,11 @@
         a:hover {
             text-decoration: none;
         }
+
+        .game-choice:hover {
+            background-color:orangered;
+            cursor: pointer;
+        }
     </style>
 
     <title>Bootstrap Template</title>
@@ -52,38 +57,55 @@
     <nav class="navbar navbar-dark bg-dark ">
         <div class="container col-12 col-xs-12">
             <a class="navbar-brand text-white text-center text-uppercase mx-auto pt-3" href="index.html">
-                <h2 class="border border-white pl-1 pr-1 pb-1 pt-1">Trivia Game</h2>
+                <h2 class="border border-white pl-1 pr-1 pb-1 pt-1">Pokemon Trivia!</h2>
             </a>
         </div>
     </nav>
     <br>
 
-
-    <div class="container bg-dark text-light">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="text-center">My Game</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 ">
-                <h2 class="text-center mx-auto" id="game-timer"></h2>
-            </div>
-        </div>
-
-        <div class="container" id="game-container">
+    <!--Main Content-->
+    <section>
+        <div class="container bg-dark text-light">
             <div class="row">
-                <div class="col-2 mx-auto">
-                    <button class=" btn btn-primary" id="start-game">Start Game</button>
+                <div class="col-12">
+                    <h1 class="text-center"id="game-name">Gotta guess 'em all!!!</h1>
+                </div>
+            </div>
+            <br>
+            
+            <!--Timer-->
+            <div class="row">
+                <div class="col-12 ">
+                    <h2 class="text-center mx-auto" id="game-timer">Get Ready!</h2>
                 </div>
             </div>
 
+            <br>
+            <br>
+            
+            <div id="game-container">
+                <!--Start Game Button-->
+                <div class="row">
+                    <div class="col-2 mx-auto">
+                        <button class=" btn btn-primary" id="start-game">Start Game</button>
+                    </div>
+                </div>
+            </div>
+
+                <!--Image Container-->
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <img src="" class=""id="image-container">
+                        <br>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+
 
 
         </div>
-
-    </div>
-
+    </section>
 
     <br>
     <br>
